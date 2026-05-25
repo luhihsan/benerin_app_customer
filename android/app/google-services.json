@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "499766438094",
+    "project_id": "beres-in-303b0",
+    "storage_bucket": "beres-in-303b0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499766438094:android:1befd8cfe919c5879d889f",
+        "android_client_info": {
+          "package_name": "com.example.customer_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNJOP97XMxX3Goe3RqvZIYvcCvA23AuHM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499766438094:android:e2ab3e78b173ad2a9d889f",
+        "android_client_info": {
+          "package_name": "com.example.mechanic_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNJOP97XMxX3Goe3RqvZIYvcCvA23AuHM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
