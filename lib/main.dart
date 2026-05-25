@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:customer_app/core/di/injection.dart';
 import 'package:customer_app/presentation/features/auth/cubit/auth_cubit.dart';
 import 'package:customer_app/presentation/features/auth/cubit/auth_state.dart';
+import 'package:customer_app/presentation/features/auth/pages/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,14 +36,13 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
             if (state is Authenticated) {
-              // Placeholder halaman utama jika sesi valid terdeteksi
               return const Scaffold(body: Center(child: Text('MASUK DASHBOARD UTAMA CUSTOMER')));
             }
             if (state is AuthLoading || state is AuthInitial) {
               return const _SplashLoadingView();
             }
-            // Mengalihkan rute ke halaman login apabila tidak ada token sesi aktif
-            return const Scaffold(body: Center(child: Text('HALAMAN LOGIN UTAMA')));
+            // SOLUSI: Mengarahkan halaman utama tidak aktif ke dalam kelas LoginPage resmi
+            return const LoginPage();
           },
         ),
       ),

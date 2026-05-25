@@ -1,15 +1,8 @@
 // lib/data/repositories/auth_repository_impl.dart
 import 'package:injectable/injectable.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repository.dart'; // Kontrak Interface samakan dengan rancangan awal
+import '../../domain/repositories/auth_repository.dart'; // Import kontrak domain yang benar
 import '../datasources/auth_remote_datasource.dart';
-
-// Interface Kontrak Repositori Lokal
-abstract class AuthRepository {
-  Future<UserEntity> loginWithEmail({required String email, required String password});
-  Future<UserEntity?> checkCurrentSession();
-  Future<void> logout();
-}
 
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
@@ -20,6 +13,22 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity> loginWithEmail({required String email, required String password}) async {
     final model = await _remoteDataSource.signInWithEmail(email: email, password: password);
+    return model.toEntity();
+  }
+
+  @override
+  Future<UserEntity> registerWithEmail({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+  }) async {
+    final model = await _remoteDataSource.signUpWithEmail(
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
+    );
     return model.toEntity();
   }
 
