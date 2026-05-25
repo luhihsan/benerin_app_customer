@@ -6,6 +6,7 @@ import 'package:customer_app/core/di/injection.dart';
 import 'package:customer_app/presentation/features/auth/cubit/auth_cubit.dart';
 import 'package:customer_app/presentation/features/auth/cubit/auth_state.dart';
 import 'package:customer_app/presentation/features/auth/pages/login_page.dart';
+import 'package:customer_app/presentation/features/main/pages/main_navigation_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,12 +37,11 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
             if (state is Authenticated) {
-              return const Scaffold(body: Center(child: Text('MASUK DASHBOARD UTAMA CUSTOMER')));
+              return const MainNavigationPage();
             }
             if (state is AuthLoading || state is AuthInitial) {
               return const _SplashLoadingView();
             }
-            // SOLUSI: Mengarahkan halaman utama tidak aktif ke dalam kelas LoginPage resmi
             return const LoginPage();
           },
         ),

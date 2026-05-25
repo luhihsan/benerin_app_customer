@@ -18,6 +18,10 @@ class Authenticated extends AuthState {
   const Authenticated(this.user);
 }
 
+class RegisterSuccess extends AuthState {
+  const RegisterSuccess();
+}
+
 class Unauthenticated extends AuthState {
   final String? errorMessage;
   const Unauthenticated({this.errorMessage});

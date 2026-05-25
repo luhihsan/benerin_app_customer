@@ -34,7 +34,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Mengeksekusi pendaftaran pelanggan baru ke sistem Cloud Firebase.
   Future<void> registerCustomer({
     required String name,
     required String email,
@@ -43,13 +42,14 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(const AuthLoading());
     try {
-      final user = await _repository.registerWithEmail(
+      await _repository.registerWithEmail(
         name: name,
         email: email,
         password: password,
         phone: phone,
       );
-      emit(Authenticated(user));
+      await _repository.logout();
+      emit(const RegisterSuccess());
     } catch (e) {
       emit(Unauthenticated(errorMessage: e.toString()));
     }
