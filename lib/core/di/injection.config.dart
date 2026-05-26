@@ -16,8 +16,11 @@ import 'package:injectable/injectable.dart' as _i526;
 
 import '../../data/datasources/auth_remote_datasource.dart' as _i1016;
 import '../../data/repositories/auth_repository_impl.dart' as _i895;
+import '../../data/repositories/booking_repository_impl.dart' as _i743;
 import '../../domain/repositories/auth_repository.dart' as _i1073;
+import '../../domain/repositories/booking_repository.dart' as _i377;
 import '../../presentation/features/auth/cubit/auth_cubit.dart' as _i224;
+import '../../presentation/features/booking/cubit/booking_cubit.dart' as _i273;
 import 'firebase_module.dart' as _i616;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -43,6 +46,10 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i895.AuthRepositoryImpl(gh<_i1016.AuthRemoteDataSource>()));
     gh.factory<_i224.AuthCubit>(
         () => _i224.AuthCubit(gh<_i1073.AuthRepository>()));
+    gh.lazySingleton<_i377.BookingRepository>(
+        () => _i743.BookingRepositoryImpl(gh<_i974.FirebaseFirestore>()));
+    gh.factory<_i273.BookingCubit>(
+        () => _i273.BookingCubit(gh<_i377.BookingRepository>()));
     return this;
   }
 }
