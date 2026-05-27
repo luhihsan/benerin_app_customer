@@ -29,12 +29,24 @@ class BookingCubit extends Cubit<BookingState> {
   Future<void> registerNewCar({
     required String customerUid,
     required String brand,
+    required String type,
     required String plate,
     required String year,
     required String color,
+    required String engineType,
+    required int km,
   }) async {
     try {
-      await _repository.addNewCar(customerUid: customerUid, brand: brand, plate: plate, year: year, color: color);
+      await _repository.addNewCar(
+        customerUid: customerUid,
+        brand: brand,
+        type: type,
+        plate: plate,
+        year: year,
+        color: color,
+        engineType: engineType,
+        km: km,
+      );
     } catch (e) {
       emit(BookingError(e.toString()));
     }

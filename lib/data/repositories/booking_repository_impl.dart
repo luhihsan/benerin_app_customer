@@ -25,16 +25,22 @@ class BookingRepositoryImpl implements BookingRepository {
   Future<void> addNewCar({
     required String customerUid,
     required String brand,
+    required String type,
     required String plate,
     required String year,
     required String color,
+    required String engineType,
+    required int km,
   }) async {
     await _firestore.collection('cars').add({
       'customerUid': customerUid,
       'brand': brand,
+      'type': type,
       'plate': plate,
       'year': year,
       'color': color,
+      'engineType': engineType,
+      'km': km,
     });
   }
 
@@ -49,18 +55,20 @@ class BookingRepositoryImpl implements BookingRepository {
     await _firestore.collection('serviceTickets').add({
       'ticketId': generatedId,
       'customerUid': customerUid,
-      'mechanicId': '', // Kosong di awal, akan diisi oleh web admin owner bengkel
-      'status': 'pending', // Status 'pending' penanda menunggu approval jadwal admin
+      'mechanicId': '', 
+      'status': 'pending', 
       'tasks': tasks,
-      'kmCheckIn': 0,
+      'kmCheckIn': car.km, // Otomatis menyalin data KM terbaru dari aset mobil pelanggan
       'carDetails': {
         'carId': car.id,
         'brand': car.brand,
+        'type': car.type,
         'plate': car.plate,
         'year': car.year,
         'color': car.color,
+        'engineType': car.engineType,
       },
-      'externalProcurements': [], // Array kosong siap diisi nota suku cadang murni oleh mekanik
+      'externalProcurements': [], 
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
