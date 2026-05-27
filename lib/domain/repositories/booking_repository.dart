@@ -1,10 +1,10 @@
 // lib/domain/repositories/booking_repository.dart
+import 'dart:io';
 import '../../data/models/car_model.dart';
 
 abstract class BookingRepository {
   Stream<List<CarModel>> streamCustomerCars(String customerUid);
 
-  /// Pendaftaran mobil baru dengan penambahan parameter spesifikasi mesin dan KM.
   Future<void> addNewCar({
     required String customerUid,
     required String brand,
@@ -20,6 +20,7 @@ abstract class BookingRepository {
     required String customerUid,
     required CarModel car,
     required String tasks,
+    required File? imageFile, 
   });
 
   Stream<List<Map<String, dynamic>>> streamCustomerTickets(String customerUid);

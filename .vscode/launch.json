@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "customer_app (Debug APK)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define-from-file",
+        "D:\\Galuh\\Project Porto\\customer_app\\secret.json"
+      ]
+    }
+  ]
+}

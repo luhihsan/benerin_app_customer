@@ -1,14 +1,17 @@
 // lib/data/repositories/booking_repository_impl.dart
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import '../../domain/repositories/booking_repository.dart';
+import '../datasources/storage_remote_datasource.dart';
 import '../models/car_model.dart';
 
 @LazySingleton(as: BookingRepository)
 class BookingRepositoryImpl implements BookingRepository {
   final FirebaseFirestore _firestore;
+  final StorageRemoteDataSource _storageRemoteDataSource; // Suntikkan data source storage baru
 
-  BookingRepositoryImpl(this._firestore);
+  BookingRepositoryImpl(this._firestore, this._storageRemoteDataSource);
 
   @override
   Stream<List<CarModel>> streamCustomerCars(String customerUid) {
@@ -49,7 +52,18 @@ class BookingRepositoryImpl implements BookingRepository {
     required String customerUid,
     required CarModel car,
     required String tasks,
+    required File? imageFile,
   }) async {
+    String complaintPhotoUrl = '';
+
+    // ALUR BERURUTAN: Jika pelanggan menyertakan foto, unggah ke Storage terlebih dahulu
+    if (imageFile != null) {
+      complaintPhotoUrl = await _storageRemoteDataSource.uploadComplaintImage(
+        customerUid: customerUid,
+        imageFile: imageFile,
+      );
+    }
+
     final String generatedId = 'SRV-${DateTime.now().millisecondsSinceEpoch}';
     
     await _firestore.collection('serviceTickets').add({
@@ -58,7 +72,8 @@ class BookingRepositoryImpl implements BookingRepository {
       'mechanicId': '', 
       'status': 'pending', 
       'tasks': tasks,
-      'kmCheckIn': car.km, // Otomatis menyalin data KM terbaru dari aset mobil pelanggan
+      'complaintPhotoUrl': complaintPhotoUrl, // Menyimpan URL bukti foto keluhan digital
+      'kmCheckIn': car.km,
       'carDetails': {
         'carId': car.id,
         'brand': car.brand,

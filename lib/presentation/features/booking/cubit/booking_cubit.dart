@@ -5,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import '../../../../data/models/car_model.dart';
 import '../../../../domain/repositories/booking_repository.dart';
 import 'booking_state.dart';
+import 'dart:io';
 
 @injectable
 class BookingCubit extends Cubit<BookingState> {
@@ -56,9 +57,15 @@ class BookingCubit extends Cubit<BookingState> {
     required String customerUid,
     required CarModel car,
     required String tasks,
+    required File? imageFile, 
   }) async {
     try {
-      await _repository.createBookingTicket(customerUid: customerUid, car: car, tasks: tasks);
+      await _repository.createBookingTicket(
+        customerUid: customerUid,
+        car: car,
+        tasks: tasks,
+        imageFile: imageFile,
+      );
     } catch (e) {
       emit(BookingError(e.toString()));
     }

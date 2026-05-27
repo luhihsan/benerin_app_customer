@@ -8,8 +8,7 @@ plugins {
 android {
     namespace = "com.example.customer_app"
     
-    // Mengunci nilai ke 34 agar aman dari error null SDK bawaan Flutter
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

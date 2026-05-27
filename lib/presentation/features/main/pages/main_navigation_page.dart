@@ -66,7 +66,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   }
 }
 
-// ==================== TAB 1: GARASI SAYA + LEMBAR TAMBAH MOBIL ====================
+// ==================== TAB 1: GARASI SAYA + CARD DETAIL MOBIL MODERN ====================
 class _GarageTab extends StatelessWidget {
   final List<CarModel> cars;
   final String customerUid;
@@ -78,17 +78,15 @@ class _GarageTab extends StatelessWidget {
     final yearController = TextEditingController();
     final colorController = TextEditingController();
     final kmController = TextEditingController();
-    final customBrandController = TextEditingController(); // Controller tambahan untuk menampung merek kustom
+    final customBrandController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
-    // Daftar master merek mobil populer/familiar di Indonesia
     final List<String> brandList = [
       'Toyota', 'Honda', 'Mitsubishi', 'Daihatsu', 'Suzuki', 
       'Nissan', 'Hyundai', 'Wuling', 'Mazda', 'Isuzu', 
       'BMW', 'Mercedes-Benz', 'Other'
     ];
 
-    // Daftar tipe dapur pacu mesin kendaraan
     final List<String> engineTypeList = ['Bensin', 'Diesel', 'Hybrid', 'EV'];
 
     String? selectedBrand;
@@ -101,9 +99,7 @@ class _GarageTab extends StatelessWidget {
       builder: (modalContext) => StatefulBuilder(
         builder: (sheetContext, setSheetState) => Padding(
           padding: EdgeInsets.only(
-            left: 24, 
-            right: 24, 
-            top: 24, 
+            left: 24, right: 24, top: 24, 
             bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 24
           ),
           child: Form(
@@ -124,14 +120,7 @@ class _GarageTab extends StatelessWidget {
                     'DAFTARKAN KENDARAAN BARU',
                     style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0F172A), letterSpacing: 0.5),
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Lengkapi data spesifikasi unit demi akurasi perawatan oleh mekanik.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // BARIS 1: Dropdown Pilihan Merek Mobil
+                  const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     value: selectedBrand,
                     decoration: InputDecoration(
@@ -141,40 +130,26 @@ class _GarageTab extends StatelessWidget {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     items: brandList.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
-                    onChanged: (val) {
-                      setSheetState(() {
-                        selectedBrand = val;
-                      });
-                    },
+                    onChanged: (val) => setSheetState(() => selectedBrand = val),
                     validator: (v) => v == null ? 'Silakan pilih merek mobil' : null,
                   ),
-                  
-                  // FITUR BARU: Input Manual Merek Kustom jika memilih 'Other' (Chery, Jaecoo, dll)
                   if (selectedBrand == 'Other') ...[
                     const SizedBox(height: 14),
                     TextFormField(
-                      key: const ValueKey('custom_brand_field'), // Mengunci elemen tree agar input connection stabil
+                      key: const ValueKey('custom_brand_field'),
                       controller: customBrandController,
                       textInputAction: TextInputAction.next,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
                         labelText: 'Masukkan Nama Merek Kustom',
-                        hintText: 'Contoh: Chery / Jaecoo',
                         prefixIcon: const Icon(Icons.edit_note_rounded),
                         filled: true, fillColor: Colors.white,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      validator: (v) {
-                        if (selectedBrand == 'Other' && (v == null || v.trim().isEmpty)) {
-                          return 'Nama merek kustom wajib diisi';
-                        }
-                        return null;
-                      },
+                      validator: (v) => selectedBrand == 'Other' && (v == null || v.trim().isEmpty) ? 'Merek kustom wajib diisi' : null,
                     ),
                   ],
                   const SizedBox(height: 14),
-
-                  // BARIS 2: Input Manual Tipe Mobil
                   TextFormField(
                     key: const ValueKey('car_type_field'),
                     controller: typeController,
@@ -182,16 +157,13 @@ class _GarageTab extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
                       labelText: 'Tipe / Model Mobil',
-                      hintText: 'Contoh: Civic RS / Innova Reborn',
                       prefixIcon: const Icon(Icons.model_training_rounded),
                       filled: true, fillColor: Colors.white,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    validator: (v) => v == null || v.trim().isEmpty ? 'Tipe mobil tidak boleh kosong' : null,
+                    validator: (v) => v == null || v.trim().isEmpty ? 'Tipe mobil wajib diisi' : null,
                   ),
                   const SizedBox(height: 14),
-
-                  // BARIS 3: Dropdown Tipe Varian Mesin (Penting untuk perlakuan Diesel vs Bensin vs EV)
                   DropdownButtonFormField<String>(
                     value: selectedEngineType,
                     decoration: InputDecoration(
@@ -205,8 +177,6 @@ class _GarageTab extends StatelessWidget {
                     validator: (v) => v == null ? 'Silakan pilih tipe penggerak mesin' : null,
                   ),
                   const SizedBox(height: 14),
-
-                  // BARIS 4: Kombinasi Grid Kiri-Kanan (Plat Nomor & Tahun Rilis)
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -215,14 +185,9 @@ class _GarageTab extends StatelessWidget {
                           key: const ValueKey('plate_field'),
                           controller: plateController,
                           textInputAction: TextInputAction.next,
-                          textCapitalization: TextCapitalization.characters, // Otomatis mengubah input menjadi huruf kapital
+                          textCapitalization: TextCapitalization.characters,
                           style: const TextStyle(fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
-                            labelText: 'Nomor Polisi',
-                            hintText: 'e.g. AB 1234 EI',
-                            filled: true, fillColor: Colors.white,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
+                          decoration: InputDecoration(labelText: 'Nomor Polisi', filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
                           validator: (v) => v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
                         ),
                       ),
@@ -234,20 +199,13 @@ class _GarageTab extends StatelessWidget {
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           style: const TextStyle(fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
-                            labelText: 'Tahun Rilis',
-                            hintText: 'e.g. 2022',
-                            filled: true, fillColor: Colors.white,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
+                          decoration: InputDecoration(labelText: 'Tahun Rilis', filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
                           validator: (v) => v == null || v.trim().isEmpty ? 'Wajib' : null,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
-
-                  // BARIS 5: Kombinasi Grid Kiri-Kanan (Warna Unit & Angka KM Terbaru)
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -257,12 +215,7 @@ class _GarageTab extends StatelessWidget {
                           controller: colorController,
                           textInputAction: TextInputAction.next,
                           style: const TextStyle(fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
-                            labelText: 'Warna Mobil',
-                            hintText: 'e.g. Hitam Metalik',
-                            filled: true, fillColor: Colors.white,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
+                          decoration: InputDecoration(labelText: 'Warna Mobil', filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
                           validator: (v) => v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
                         ),
                       ),
@@ -273,39 +226,22 @@ class _GarageTab extends StatelessWidget {
                           controller: kmController,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Penambahan impor material aman
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E40AF)),
-                          decoration: InputDecoration(
-                            labelText: 'KM Aktual Saat Ini',
-                            suffixText: 'KM',
-                            filled: true, fillColor: Colors.white,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          validator: (v) {
-                            if (v == null || v.isEmpty) return 'Wajib diisi';
-                            if (int.tryParse(v) == null) return 'Angka tidak valid';
-                            return null;
-                          },
+                          decoration: InputDecoration(labelText: 'KM Aktual', suffixText: 'KM', filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                          validator: (v) => v == null || v.isEmpty ? 'Wajib diisi' : null,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 32),
-
-                  // Tombol Utama Eksekusi Simpan Aset
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // SOLUSI KEYBOARD GLITCH: Tutup software keyboard secara native sebelum melakukan submit form data
                         FocusScope.of(sheetContext).unfocus();
-
                         if (formKey.currentState!.validate() && selectedBrand != null && selectedEngineType != null) {
-                          // LOGIKA SELEKSI MEREK: Jika memilih 'Other', ambil string teks manual dari customBrandController
-                          final String finalBrand = selectedBrand == 'Other' 
-                              ? customBrandController.text.trim() 
-                              : selectedBrand!;
-
+                          final String finalBrand = selectedBrand == 'Other' ? customBrandController.text.trim() : selectedBrand!;
                           cubit.registerNewCar(
                             customerUid: customerUid,
                             brand: finalBrand,
@@ -314,28 +250,13 @@ class _GarageTab extends StatelessWidget {
                             year: yearController.text.trim(),
                             color: colorController.text.trim(),
                             engineType: selectedEngineType!,
-                            km: int.tryParse(kmController.text) ?? 0, // Proteksi parsing biner angka murni
+                            km: int.tryParse(kmController.text) ?? 0,
                           );
-
-                          Navigator.pop(modalContext); // Menutup sheet dengan aman
-                        } else {
-                          // Notifikasi jika ada drop-down yang terlewat belum dipilih oleh customer
-                          ScaffoldMessenger.of(sheetContext).showSnackBar(
-                            const SnackBar(
-                              content: Text('Silakan lengkapi seluruh isian data spesifikasi kendaraan terlebih dahulu!'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                          Navigator.pop(modalContext);
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey.shade900,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0,
-                      ),
-                      child: const Text('SIMPAN UNIT KE GARASI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5)),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey.shade900, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 18), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                      child: const Text('SIMPAN UNIT KE GARASI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                   ),
                 ],
@@ -352,59 +273,145 @@ class _GarageTab extends StatelessWidget {
     final bookingCubit = context.read<BookingCubit>();
     return Scaffold(
       backgroundColor: Colors.blueGrey.shade50,
-      appBar: AppBar(title: const Text('GARASI DIGITAL SAYA', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)), backgroundColor: Colors.white, elevation: 0),
+      appBar: AppBar(
+        title: const Text('GARASI DIGITAL SAYA', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)), 
+        backgroundColor: Colors.white, 
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
       body: cars.isEmpty
           ? const Center(child: Text('Garasi kosong, silakan daftarkan mobil pertama Anda.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)))
           : ListView.builder(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               itemCount: cars.length,
               itemBuilder: (context, index) {
                 final car = cars[index];
+                
+                // Menentukan indikator warna lencana tipe penggerak mesin secara estetik
+                Color engineBadgeColor = Colors.blue.shade700;
+                if (car.engineType == 'Diesel') engineBadgeColor = Colors.amber.shade900;
+                if (car.engineType == 'EV') engineBadgeColor = Colors.green.shade700;
+                if (car.engineType == 'Hybrid') engineBadgeColor = Colors.purple.shade700;
+
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white, 
-                    borderRadius: BorderRadius.circular(16), 
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.blueGrey.shade100),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueGrey.withValues(alpha: 0.05),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Colors.blueGrey.shade800, 
-                      child: const Icon(Icons.directions_car_filled_rounded, color: Colors.white)
-                    ),
-                    title: Text('${car.brand} ${car.type}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(6)),
-                            child: Text(car.engineType, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue.shade800)),
-                          ),
-                          const SizedBox(width: 8),
-                          Text('${car.km} KM • ${car.color}', style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)),
-                        ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Kartu Detail Mobil
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    car.brand.toUpperCase(),
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.blue, letterSpacing: 0.5),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    car.type,
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.blueGrey.shade900),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.blueGrey.shade900,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                car.plate,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(color: Colors.blueGrey.shade900, borderRadius: BorderRadius.circular(8)),
-                      child: Text(car.plate, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 0.5)),
-                    ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Divider(color: Colors.black12, height: 1),
+                      ),
+                      // Grid Rincian Spesifikasi Fisik Kendaraan
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _CarSpecItem(icon: Icons.local_gas_station_rounded, title: 'TIPE MESIN', value: car.engineType, valueColor: engineBadgeColor),
+                            _CarSpecItem(icon: Icons.speed_rounded, title: 'ODOMETER', value: '${car.km} KM', valueColor: Colors.blueGrey.shade800),
+                            _CarSpecItem(icon: Icons.palette_rounded, title: 'WARNA', value: car.color, valueColor: Colors.black87),
+                            _CarSpecItem(icon: Icons.calendar_today_rounded, title: 'TAHUN', value: car.year, valueColor: Colors.black87),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_garasi_register', // SOLUSI: Mengunci Tag Hero unik agar terbebas dari crash duplikasi tag
         onPressed: () => _openAddCarSheet(context, bookingCubit),
         backgroundColor: Colors.blueGrey.shade900,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: const Text('REGISTRASI MOBIL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
       ),
+    );
+  }
+}
+
+/// Komponen rincian spesifikasi grid di dalam kartu detail kendaraan pelanggan
+class _CarSpecItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color valueColor;
+
+  const _CarSpecItem({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 12, color: Colors.grey),
+            const SizedBox(width: 4),
+            Text(title, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.3)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: valueColor),
+        ),
+      ],
     );
   }
 }
@@ -455,7 +462,7 @@ class _ServiceMonitoringTab extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Text(carData['brand'] ?? 'Mobil', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text('${carData['brand'] ?? 'Mobil'} ${carData['type'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       Text('Plat Nomor: ${carData['plate'] ?? '-'}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
                       const Divider(height: 24),
                       const Text('KELUHAN / PENGERJAAN:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
@@ -466,6 +473,7 @@ class _ServiceMonitoringTab extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_service_booking', // SOLUSI: Mengunci Tag Hero unik agar terbebas dari crash duplikasi tag
         onPressed: () {
           if (cars.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Silakan daftarkan mobil Anda di tab Garasi terlebih dahulu!')));
