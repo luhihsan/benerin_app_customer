@@ -9,7 +9,7 @@ import '../models/car_model.dart';
 @LazySingleton(as: BookingRepository)
 class BookingRepositoryImpl implements BookingRepository {
   final FirebaseFirestore _firestore;
-  final StorageRemoteDataSource _storageRemoteDataSource; // Suntikkan data source storage baru
+  final StorageRemoteDataSource _storageRemoteDataSource;
 
   BookingRepositoryImpl(this._firestore, this._storageRemoteDataSource);
 
@@ -26,14 +26,9 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<void> addNewCar({
-    required String customerUid,
-    required String brand,
-    required String type,
-    required String plate,
-    required String year,
-    required String color,
-    required String engineType,
-    required int km,
+    required String customerUid, required String brand, required String type,
+    required String plate, required String year, required String color,
+    required String engineType, required int km,
   }) async {
     await _firestore.collection('cars').add({
       'customerUid': customerUid,
@@ -52,15 +47,14 @@ class BookingRepositoryImpl implements BookingRepository {
     required String customerUid,
     required CarModel car,
     required String tasks,
-    required File? imageFile,
+    required List<File> imageFiles,
   }) async {
-    String complaintPhotoUrl = '';
+    List<String> uploadedUrls = [];
 
-    // ALUR BERURUTAN: Jika pelanggan menyertakan foto, unggah ke Storage terlebih dahulu
-    if (imageFile != null) {
-      complaintPhotoUrl = await _storageRemoteDataSource.uploadComplaintImage(
-        customerUid: customerUid,
-        imageFile: imageFile,
+    // Jika ada list foto yang dipilih oleh pelanggan, eksekusi upload massal ke ImgBB
+    if (imageFiles.isNotEmpty) {
+      uploadedUrls = await _storageRemoteDataSource.uploadMultipleComplaintImages(
+        imageFiles: imageFiles,
       );
     }
 
@@ -72,7 +66,7 @@ class BookingRepositoryImpl implements BookingRepository {
       'mechanicId': '', 
       'status': 'pending', 
       'tasks': tasks,
-      'complaintPhotoUrl': complaintPhotoUrl, // Menyimpan URL bukti foto keluhan digital
+      'complaintPhotoUrls': uploadedUrls, // Disimpan sebagai array string berisi sekumpulan URL foto bukti
       'kmCheckIn': car.km,
       'carDetails': {
         'carId': car.id,

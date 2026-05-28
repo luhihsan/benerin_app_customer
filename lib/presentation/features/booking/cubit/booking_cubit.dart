@@ -57,14 +57,14 @@ class BookingCubit extends Cubit<BookingState> {
     required String customerUid,
     required CarModel car,
     required String tasks,
-    required File? imageFile, 
+    required List<File> imageFiles, 
   }) async {
     try {
       await _repository.createBookingTicket(
         customerUid: customerUid,
         car: car,
         tasks: tasks,
-        imageFile: imageFile,
+        imageFiles: imageFiles,
       );
     } catch (e) {
       emit(BookingError(e.toString()));
