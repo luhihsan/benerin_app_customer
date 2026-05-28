@@ -23,6 +23,8 @@ import '../../domain/repositories/auth_repository.dart' as _i1073;
 import '../../domain/repositories/booking_repository.dart' as _i377;
 import '../../presentation/features/auth/cubit/auth_cubit.dart' as _i224;
 import '../../presentation/features/booking/cubit/booking_cubit.dart' as _i273;
+import '../../presentation/features/history/cubit/car_history_cubit.dart'
+    as _i252;
 import 'firebase_module.dart' as _i616;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -58,6 +60,8 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.factory<_i273.BookingCubit>(
         () => _i273.BookingCubit(gh<_i377.BookingRepository>()));
+    gh.factory<_i252.CarHistoryCubit>(
+        () => _i252.CarHistoryCubit(gh<_i377.BookingRepository>()));
     return this;
   }
 }

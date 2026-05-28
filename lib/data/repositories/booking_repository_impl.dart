@@ -95,4 +95,18 @@ class BookingRepositoryImpl implements BookingRepository {
               return data;
             }).toList());
   }
+
+  @override
+  Stream<List<Map<String, dynamic>>> streamTicketsByCar(String carId) {
+    return _firestore
+        .collection('serviceTickets')
+        .where('carDetails.carId', isEqualTo: carId) // Menembak sub-object carDetails di Firestore
+        .orderBy('createdAt', descending: true)     // Mengurutkan dari servis paling terbaru
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['documentId'] = doc.id;
+              return data;
+            }).toList());
+  }
 }

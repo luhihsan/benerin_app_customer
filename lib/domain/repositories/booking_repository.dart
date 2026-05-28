@@ -20,4 +20,5 @@ abstract class BookingRepository {
   });
 
   Stream<List<Map<String, dynamic>>> streamCustomerTickets(String customerUid);
+  Stream<List<Map<String, dynamic>>> streamTicketsByCar(String carId);
 }

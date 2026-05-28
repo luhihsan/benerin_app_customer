@@ -1,4 +1,5 @@
 // lib/presentation/features/main/pages/main_navigation_page.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import '../../booking/cubit/booking_cubit.dart';
 import '../../booking/cubit/booking_state.dart';
 import '../../booking/pages/booking_page.dart';
 import '../../profile/pages/profile_page.dart';
+import '../../history/pages/car_history_page.dart'; // INTEGRASI: Import halaman riwayat servis
 import '../../../../data/models/car_model.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -226,7 +228,6 @@ class _GarageTab extends StatelessWidget {
                           controller: kmController,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E40AF)),
                           decoration: InputDecoration(labelText: 'KM Aktual', suffixText: 'KM', filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
                           validator: (v) => v == null || v.isEmpty ? 'Wajib diisi' : null,
@@ -287,89 +288,114 @@ class _GarageTab extends StatelessWidget {
               itemBuilder: (context, index) {
                 final car = cars[index];
                 
-                // Menentukan indikator warna lencana tipe penggerak mesin secara estetik
                 Color engineBadgeColor = Colors.blue.shade700;
                 if (car.engineType == 'Diesel') engineBadgeColor = Colors.amber.shade900;
                 if (car.engineType == 'EV') engineBadgeColor = Colors.green.shade700;
                 if (car.engineType == 'Hybrid') engineBadgeColor = Colors.purple.shade700;
 
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.blueGrey.shade100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blueGrey.withValues(alpha: 0.05),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Kartu Detail Mobil
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    car.brand.toUpperCase(),
-                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.blue, letterSpacing: 0.5),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    car.type,
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.blueGrey.shade900),
-                                  ),
-                                ],
+                // INTEGRASI GERBANG NAVIGASI RIWAYAT: Kartu dibungkus GestureDetector/InkWell
+                return GestureDetector(
+                  onTap: () {
+                    // Trik Pro: Susun ulang list agar mobil yang diketuk berada di urutan pertama (langsung aktif)
+                    final List<CarModel> reorderedCars = [
+                      car,
+                      ...cars.where((c) => c.id != car.id),
+                    ];
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CarHistoryPage(cars: reorderedCars),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.blueGrey.shade100),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueGrey.withValues(alpha: 0.05),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      car.brand.toUpperCase(),
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.blue, letterSpacing: 0.5),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      car.type,
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.blueGrey.shade900),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.blueGrey.shade900,
-                                borderRadius: BorderRadius.circular(10),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueGrey.shade900,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  car.plate,
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                                ),
                               ),
-                              child: Text(
-                                car.plate,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Divider(color: Colors.black12, height: 1),
-                      ),
-                      // Grid Rincian Spesifikasi Fisik Kendaraan
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _CarSpecItem(icon: Icons.local_gas_station_rounded, title: 'TIPE MESIN', value: car.engineType, valueColor: engineBadgeColor),
-                            _CarSpecItem(icon: Icons.speed_rounded, title: 'ODOMETER', value: '${car.km} KM', valueColor: Colors.blueGrey.shade800),
-                            _CarSpecItem(icon: Icons.palette_rounded, title: 'WARNA', value: car.color, valueColor: Colors.black87),
-                            _CarSpecItem(icon: Icons.calendar_today_rounded, title: 'TAHUN', value: car.year, valueColor: Colors.black87),
-                          ],
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Divider(color: Colors.black12, height: 1),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _CarSpecItem(icon: Icons.local_gas_station_rounded, title: 'TIPE MESIN', value: car.engineType, valueColor: engineBadgeColor),
+                              _CarSpecItem(icon: Icons.speed_rounded, title: 'ODOMETER', value: '${car.km} KM', valueColor: Colors.blueGrey.shade800),
+                              _CarSpecItem(icon: Icons.palette_rounded, title: 'WARNA', value: car.color, valueColor: Colors.black87),
+                              _CarSpecItem(icon: Icons.calendar_today_rounded, title: 'TAHUN', value: car.year, valueColor: Colors.black87),
+                            ],
+                          ),
+                        ),
+                        // Indikator UX tambahan agar user tahu kartu bisa diketuk
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text('Lihat Riwayat Servis', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blueGrey.shade400)),
+                              const SizedBox(width: 4),
+                              Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Colors.blueGrey.shade300),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'fab_garasi_register', // SOLUSI: Mengunci Tag Hero unik agar terbebas dari crash duplikasi tag
+        heroTag: 'fab_garasi_register', 
         onPressed: () => _openAddCarSheet(context, bookingCubit),
         backgroundColor: Colors.blueGrey.shade900,
         foregroundColor: Colors.white,
@@ -380,7 +406,6 @@ class _GarageTab extends StatelessWidget {
   }
 }
 
-/// Komponen rincian spesifikasi grid di dalam kartu detail kendaraan pelanggan
 class _CarSpecItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -456,7 +481,8 @@ class _ServiceMonitoringTab extends StatelessWidget {
                           Text(t['ticketId'] ?? '-', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 12)),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                            // MODERNISED: Mengubah .withOpacity() menjadi .withValues() agar bebas warning linter SDK baru
+                            decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                             child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 10)),
                           )
                         ],
@@ -473,7 +499,7 @@ class _ServiceMonitoringTab extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'fab_service_booking', // SOLUSI: Mengunci Tag Hero unik agar terbebas dari crash duplikasi tag
+        heroTag: 'fab_service_booking', 
         onPressed: () {
           if (cars.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Silakan daftarkan mobil Anda di tab Garasi terlebih dahulu!')));
