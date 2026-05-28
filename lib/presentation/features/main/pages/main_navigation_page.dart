@@ -10,7 +10,8 @@ import '../../booking/cubit/booking_cubit.dart';
 import '../../booking/cubit/booking_state.dart';
 import '../../booking/pages/booking_page.dart';
 import '../../profile/pages/profile_page.dart';
-import '../../history/pages/car_history_page.dart'; // INTEGRASI: Import halaman riwayat servis
+import '../../history/pages/car_history_page.dart'; 
+import '../../history/pages/service_tracking_page.dart';
 import '../../../../data/models/car_model.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -467,33 +468,59 @@ class _ServiceMonitoringTab extends StatelessWidget {
                 if (status == 'waiting') { statusColor = Colors.orange.shade800; statusText = 'DALAM ANTREAN'; }
                 if (status == 'processing') { statusColor = Colors.blue.shade800; statusText = 'SEDANG DIKERJAKAN'; }
                 if (status == 'completed') { statusColor = Colors.green.shade700; statusText = 'SELESAI'; }
-
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.blueGrey.shade100)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(t['ticketId'] ?? '-', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 12)),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            // MODERNISED: Mengubah .withOpacity() menjadi .withValues() agar bebas warning linter SDK baru
-                            decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                            child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 10)),
-                          )
-                        ],
+                
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ServiceTrackingPage(ticket: t),
                       ),
-                      const SizedBox(height: 12),
-                      Text('${carData['brand'] ?? 'Mobil'} ${carData['type'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                      Text('Plat Nomor: ${carData['plate'] ?? '-'}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                      const Divider(height: 24),
-                      const Text('KELUHAN / PENGERJAAN:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-                      Text(t['tasks'] ?? '-', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white, 
+                      borderRadius: BorderRadius.circular(16), 
+                      border: Border.all(color: Colors.blueGrey.shade100),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(t['ticketId'] ?? '-', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 12)),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                              child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 10)),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text('${carData['brand'] ?? 'Mobil'} ${carData['type'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        Text('Plat Nomor: ${carData['plate'] ?? '-'}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                        const Divider(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('KELUHAN / PENGERJAAN:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                  Text(t['tasks'] ?? '-', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.blueGrey.shade300),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
